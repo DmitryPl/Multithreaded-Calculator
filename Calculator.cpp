@@ -1,12 +1,19 @@
 #include "Calculator.hpp"
 
-void Calculator::Run(int world_rank, int world_size)
+void Calculator::Run()
+{
+	world_rank == 0 ? master() : slave();
+}
+
+void Calculator::master()
 {
 	try
 	{
 		double start_time = 0;
 		start_time = MPI_Wtime();
-		
+
+		init();
+
 		Dialog();
 
 		printf("MASTER >> TIME:%f\n", getTime(start_time));
@@ -19,10 +26,16 @@ void Calculator::Run(int world_rank, int world_size)
 	{
 		print("Error - default\n");
 	}
+	halt();
 }
 
 void Calculator::Dialog()
 {
+	if (world_rank != 0)
+	{
+		throw SystemException("Error - wrong thread");
+	}
+
 	bool flag = true;
 	while (flag)
 	{
@@ -295,6 +308,120 @@ double Calculator::GetFunc(uint n)
 	}
 	else
 		throw SystemException("Error - GetFunc - (");
+}
+
+void Calculator::halt()
+{
+	if (world_rank != 0)
+	{
+		throw SystemException("Error - wrong thread");
+	}
+
+	Message msg(HALT, HALT);
+	send(msg, world_rank, world_size);
+}
+
+void Calculator::init()
+{
+	if (world_rank == 0)
+	{
+		Message msg(INIT, level);
+		send(msg, world_rank, world_size);
+	}
+	factorial(level);
+	if (DEBUG)
+	{
+		printFact();
+	}
+}
+
+void Calculator::slave()
+{
+	try
+	{
+		double start_time = 0;
+		start_time = MPI_Wtime();
+
+		wait();
+
+		printf("SLAVE-%d >>> TIME:%f\n", world_rank, getTime(start_time));
+	}
+	catch (const exception &exc)
+	{
+		print(exc.what());
+	}
+	catch (...)
+	{
+		print("Error - default\n");
+	}
+}
+
+void Calculator::wait()
+{
+	bool flag = true;
+	while (flag)
+	{
+		Message msg;
+		send(msg, world_rank, world_size);
+		switch (msg.getFirst())
+		{
+		case HALT:
+			flag = false;
+			break;
+		case INIT:
+			level = msg.getSecond();
+			init();
+			break;
+		default : break;
+		}
+	}
+}
+
+long Calculator::getFactorial(long n)
+{
+	long i = 0;
+	if (factorials == nullptr)
+	{
+		throw SystemException(__LINE__, __func__, "Error - nullptr");
+	}
+	if (n <= 1)
+	{
+		factorials[n - 1] = i = 1;
+	}
+	else
+	{
+		factorials[n - 1] = i = n * getFactorial(n - 1);
+	}
+	return i;
+}
+
+void Calculator::factorial(int n)
+{
+	if (n < 1)
+	{
+		throw SystemException(__LINE__, __func__, "Error - n < 1");
+	}
+	factorials = (ulong *)calloc(n, sizeof(ulong));
+	if (factorials == nullptr)
+	{
+		throw SystemException(__LINE__, __func__, "Error - n < 1");
+	}
+
+	getFactorial(n);
+}
+
+void Calculator::printFact()
+{
+	if (factorials != nullptr)
+	{
+		for (int i = 0; i < level; i++)
+		{
+			printf("%ld ", factorials[i]);
+		}
+		printf("\n");
+	}
+	else
+		print("nullptr - factorials");
 }
 
 inline void Calculator::skip()

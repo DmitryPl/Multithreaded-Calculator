@@ -29,33 +29,55 @@ using std::string;
 
 class Calculator
 {
-  private:
-    uint place;
-    uint level;
+private:
+  uint place;
+  uint level;
+  ulong *factorials;
 
-    string str;
-    double answer;
+  int world_rank;
+  int world_size;
 
-    double getTime(double start);
-    void Dialog();
-    bool parse();
-    void skip();
-    void update();
-    void check();
+  string str;
+  double answer;
 
-    double GetN();
-    double GetT();
-    double GetE();
-    double GetP();
-    double GetD();
-    double GetI();
-    double GetFunc(uint i);
+  double getTime(double start);
+  void Dialog();
+  bool parse();
+  void skip();
+  void update();
+  void check();
 
-  public:
-    explicit Calculator() : place(0), level(10),
-                            answer(0), str("") {}
+  double GetN();
+  double GetT();
+  double GetE();
+  double GetP();
+  double GetD();
+  double GetI();
+  double GetFunc(uint i);
 
-    void Run(int, int);
+  long getFactorial(long n);
+  void factorial(int n);
+  void printFact();
+
+  void master();
+  void halt();
+  void init();
+  void wait();
+  void slave();
+  Calculator() {}
+
+public:
+  explicit Calculator(int rank, int size) : place(0), level(10), answer(0), str(""),
+                                            world_rank(rank), world_size(size), factorials(nullptr) {}
+
+  void Run();
+  ~Calculator()
+  {
+    if (factorials != nullptr)
+    {
+      free(factorials);
+    }
+  }
 };
 
 #include "Calculator.cpp"
