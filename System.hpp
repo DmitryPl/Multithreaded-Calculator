@@ -10,9 +10,17 @@
 using std::exception;
 using std::string;
 
-const static volatile int success = 42;
+const static int success = 42;
 const static double PI = 3.1415926535897932385;
 const static double E = 2.7182818284590452354;
+
+#define HALT    0
+#define INIT    1
+#define ERROR   -1
+#define SIN     11
+#define COS     12
+#define LN      13
+#define EXP     14
 
 class SystemException : public exception {
 public:

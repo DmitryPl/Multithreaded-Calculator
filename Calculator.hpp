@@ -22,48 +22,40 @@
 #include <exception>
 #include <iostream>
 
-using std::getline;
-using std::string;
 using std::cin;
 using std::exception;
+using std::getline;
+using std::string;
 
-class Calculator {
-private:
-    ulong* factorials;
+class Calculator
+{
+  private:
     uint place;
     uint level;
 
     string str;
     double answer;
 
-    long ProdTree(int l, int r);
-    long FactTree(int n);
-    long getFactorial(long n);
-    void factorial(int n);
-    void master(int, int);
-    void slave(int, int);
-    void printFact();
     double getTime(double start);
     void Dialog();
     bool parse();
     void skip();
     void update();
     void check();
-    
-	double GetN();
-	double GetT();
-	double GetE();
-	double GetP();
-	double GetD();
-	double GetI();
+
+    double GetN();
+    double GetT();
+    double GetE();
+    double GetP();
+    double GetD();
+    double GetI();
     double GetFunc(uint i);
 
-public:
-    explicit Calculator() : 
-    place(0), factorials(nullptr), level(10), 
-    answer(0), str("") { }
+  public:
+    explicit Calculator() : place(0), level(10),
+                            answer(0), str("") {}
 
-    void Run();
+    void Run(int, int);
 };
 
 #include "Calculator.cpp"
