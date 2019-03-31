@@ -30,16 +30,6 @@ bool IsItNumber(const string &word)
 	return true;
 }
 
-void ping(int line)
-{
-	printf("PING! %d\n", line);
-}
-
-void sizes()
-{
-	printf(">>> sizeof MPI_INT:%ld sizeof data_t:%ld\n", sizeof(MPI_INT), sizeof(data_t));
-}
-
 void send(Message &msg, int rank, int size)
 {
 	int *comm = nullptr;
@@ -58,19 +48,15 @@ void send(Message &msg, int rank, int size)
 
 		if (DEBUG)
 		{
+			print("Sended commands");
 			for (uint i = 0; i < size; i++)
-				printf("%d %f \n", comm[i], data[i]);
-			printf("\n");
+				printf("comm:%d data:%.16lf \n", comm[i], data[i]);
+			print("\n");
 		}
 	}
 	
 	MPI_Scatter(comm, 1, MPI_INT, &first, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI_Scatter(data, 1, MPI_DOUBLE, &second, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-	if (DEBUG)
-	{
-		printf("%d %f\n", first, second);
-	}
 
 	if (rank == 0)
 	{
@@ -87,6 +73,12 @@ void get(Message &msg, int rank, int size)
 	double *data = nullptr;
 	int first = msg.getFirst(); 
 	double second = msg.getSecond();
+    
+	if (DEBUG) 
+	{
+		printf("Sended >> comm:%d data:%.16lf by %d\n", first, second, rank);
+	}
+
 	if (rank == 0)
 	{
 		msg.setData(

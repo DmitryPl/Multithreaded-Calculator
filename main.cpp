@@ -17,7 +17,7 @@ int main()
         int world_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-        if (world_size < 3)
+        if (world_size < 1)
         {
             throw SystemException(__LINE__, __func__, "Error - world size < 3");
         }

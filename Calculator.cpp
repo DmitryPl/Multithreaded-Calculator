@@ -54,7 +54,7 @@ void Calculator::Dialog()
 			print("try again");
 		}
 		else
-			printf("Master >> Answer:%f, time:%f\n", answer, getTime(start_time));
+			printf("Master >> Answer:%.16lf, time:%.16lf\n", answer, getTime(start_time));
 	}
 }
 
@@ -262,6 +262,7 @@ double Calculator::GetI()
 		val = GetFunc(2);
 		if (val < 0)
 		{
+
 			return log(val);
 		}
 		else
@@ -270,12 +271,26 @@ double Calculator::GetI()
 	else if (str[place] == 's' && str[place + 1] == 'i' && str[place + 2] == 'n')
 	{
 		val = GetFunc(3);
-		return sin(val);
+		if (SUM)
+		{
+			return sinus(val);
+		}
+		else
+		{
+			return sin(val);
+		}
 	}
 	else if (str[place] == 'c' && str[place + 1] == 'o' && str[place + 2] == 's')
 	{
 		val = GetFunc(3);
-		return cos(val);
+		if (SUM)
+		{
+			cosinus(val);
+		}
+		else
+		{
+			return cos(val);
+		}
 	}
 	else if (str[place] == 's' && str[place + 1] == 'q' && str[place + 2] == 'r' && str[place + 3] == 't')
 	{
@@ -329,9 +344,21 @@ void Calculator::init()
 		send(msg, world_rank, world_size);
 	}
 	factorial(level);
-	if (DEBUG)
+	if (DEBUG_FACT)
 	{
 		printFact();
+	}
+
+	if (level >= world_size)
+	{
+		int cell = level / (world_size);
+		start = world_rank * cell;
+		end = (world_rank == world_size - 1) ? (level) : ((world_rank + 1) * cell - 1);
+		printf("Cell >> start:%d end:%d to %d\n", start, end, world_rank);
+	}
+	else
+	{
+		throw SystemException("Error - level < world_size");
 	}
 }
 
@@ -372,9 +399,85 @@ void Calculator::wait()
 			level = msg.getSecond();
 			init();
 			break;
-		default : break;
+		case SIN:
+			sinus(msg.getSecond());
+			break;
+		case COS:
+			cosinus(msg.getSecond());
+			break;
+		case LN:
+			logariphm(msg.getSecond());
+			break;
+		default:
+			flag = false;
+			break;
 		}
 	}
+}
+
+double Calculator::sinus(double x)
+{
+	if (world_rank == 0)
+	{
+		Message msg(SIN, x);
+		send(msg, world_rank, world_size);
+	}
+	double sum = 0;
+	for (int i = start; i <= end; i++)
+	{
+		printf("components: %lf %lf %ld for %d   ", pow(-1, i), pow(x, 2 * i + 1), factorials[2 * i + 1], i);
+		sum += pow(-1, i) * pow(x, 2 * i + 1) / factorials[2 * i];
+ 		if (DEBUG) {
+			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
+		}
+	}
+	Message msg(SIN, sum);
+	get(msg, world_rank, world_size);
+	if (world_rank == 0)
+	{
+		return msg.returnSum(world_size);
+	}
+	else
+		return 0.0;
+}
+
+double Calculator::cosinus(double x)
+{
+	if (world_rank == 0)
+	{
+		Message msg(COS, x);
+		send(msg, world_rank, world_size);
+	}
+	double sum = 0; 
+	for (int i = start; i <= end; i++)
+	{
+		printf("components: %lf %lf %ld for %d   ", pow(-1, i), pow(x, 2 * i), factorials[2 * i], i);
+		sum += pow(-1, i) * pow(x, 2 * i) / factorials[2 * i];
+		if (DEBUG) {
+			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
+		}
+	}
+	Message msg(COS, sum);
+	get(msg, world_rank, world_size);
+	if (world_rank == 0)
+	{
+		return msg.returnSum(world_size);
+	}
+	else
+		return 0.0;
+}
+
+double Calculator::logariphm(double x)
+{
+	if (world_rank == 0)
+	{
+		Message msg(LN, x);
+		send(msg, world_rank, world_size);
+	}
+	else
+	{
+	}
+	return NAN;
 }
 
 long Calculator::getFactorial(long n)
@@ -397,6 +500,7 @@ long Calculator::getFactorial(long n)
 
 void Calculator::factorial(int n)
 {
+	n = n*2 + 2;
 	if (n < 1)
 	{
 		throw SystemException(__LINE__, __func__, "Error - n < 1");
@@ -414,7 +518,7 @@ void Calculator::printFact()
 {
 	if (factorials != nullptr)
 	{
-		for (int i = 0; i < level; i++)
+		for (int i = 0; i < level * 2; i++)
 		{
 			printf("%ld ", factorials[i]);
 		}

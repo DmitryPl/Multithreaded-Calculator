@@ -36,6 +36,8 @@ private:
 
   int world_rank;
   int world_size;
+  uint start;
+  uint end;
 
   string str;
   double answer;
@@ -63,12 +65,17 @@ private:
   void halt();
   void init();
   void wait();
+  double sinus(double x);
+  double cosinus(double x);
+  double logariphm(double x);
+  double exponenta(double x);
   void slave();
   Calculator() {}
 
 public:
-  explicit Calculator(int rank, int size) : place(0), level(10), answer(0), str(""),
-                                            world_rank(rank), world_size(size), factorials(nullptr) {}
+  explicit Calculator(int rank, int size) : place(0), level(9), answer(0),
+                                            str(""), start(0), end(0), world_rank(rank),
+                                            world_size(size), factorials(nullptr) {}
 
   void Run();
   ~Calculator()
