@@ -47,14 +47,31 @@ void Calculator::Dialog()
 			flag = false;
 			break;
 		}
-		str.append("\0");
-		double start_time = MPI_Wtime();
-		if (!parse() || str[place] != '\0')
+		else if (str == "DEBUG:change")
 		{
-			print("try again");
+			DEBUG = !DEBUG;
+		}
+		else if (str == "SUM:change")
+		{
+			SUM = !SUM;
+		}
+		else if (str == "DFACT:change")
+		{
+			DEBUG_FACT = !DEBUG_FACT;
 		}
 		else
-			printf("Master >> Answer:%.16lf, time:%.16lf\n", answer, getTime(start_time));
+		{
+			str.append("\0");
+			double start_time = MPI_Wtime();
+			if (!parse() || str[place] != '\0')
+			{
+				print("try again");
+			}
+			else
+			{
+				printf("Master >> Answer:%.16lf, time:%.16lf\n", answer, getTime(start_time));
+			}
+		}
 	}
 }
 
@@ -354,7 +371,10 @@ void Calculator::init()
 		int cell = level / (world_size);
 		start = world_rank * cell;
 		end = (world_rank == world_size - 1) ? (level) : ((world_rank + 1) * cell - 1);
-		printf("Cell >> start:%d end:%d to %d\n", start, end, world_rank);
+		if (DEBUG)
+		{
+			printf("Cell >> start:%d end:%d to %d\n", start, end, world_rank);
+		}
 	}
 	else
 	{
@@ -425,9 +445,16 @@ double Calculator::sinus(double x)
 	double sum = 0;
 	for (int i = start; i <= end; i++)
 	{
-		printf("components: %lf %lf %ld for %d   ", pow(-1, i), pow(x, 2 * i + 1), factorials[2 * i + 1], i);
+		if (SUM)
+		{
+			printf("components: %lf %lf %ld for %d   ",
+				   pow(-1, i),
+				   pow(x, 2 * i + 1),
+				   factorials[2 * i + 1], i);
+		}
 		sum += pow(-1, i) * pow(x, 2 * i + 1) / factorials[2 * i];
- 		if (DEBUG) {
+		if (SUM)
+		{
 			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
 		}
 	}
@@ -438,7 +465,9 @@ double Calculator::sinus(double x)
 		return msg.returnSum(world_size);
 	}
 	else
+	{
 		return 0.0;
+	}
 }
 
 double Calculator::cosinus(double x)
@@ -448,12 +477,19 @@ double Calculator::cosinus(double x)
 		Message msg(COS, x);
 		send(msg, world_rank, world_size);
 	}
-	double sum = 0; 
+	double sum = 0;
 	for (int i = start; i <= end; i++)
 	{
-		printf("components: %lf %lf %ld for %d   ", pow(-1, i), pow(x, 2 * i), factorials[2 * i], i);
+		if (SUM)
+		{
+			printf("components: %lf %lf %ld for %d   ",
+				   pow(-1, i),
+				   pow(x, 2 * i),
+				   factorials[2 * i], i);
+		}
 		sum += pow(-1, i) * pow(x, 2 * i) / factorials[2 * i];
-		if (DEBUG) {
+		if (SUM)
+		{
 			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
 		}
 	}
@@ -464,7 +500,9 @@ double Calculator::cosinus(double x)
 		return msg.returnSum(world_size);
 	}
 	else
+	{
 		return 0.0;
+	}
 }
 
 double Calculator::logariphm(double x)
@@ -500,7 +538,7 @@ long Calculator::getFactorial(long n)
 
 void Calculator::factorial(int n)
 {
-	n = n*2 + 2;
+	n = n * 2 + 2;
 	if (n < 1)
 	{
 		throw SystemException(__LINE__, __func__, "Error - n < 1");

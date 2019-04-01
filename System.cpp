@@ -33,15 +33,16 @@ bool IsItNumber(const string &word)
 void send(Message &msg, int rank, int size)
 {
 	int *comm = nullptr;
-	double* data = nullptr;
-	int first = msg.getFirst(); 
+	double *data = nullptr;
+	int first = msg.getFirst();
 	double second = msg.getSecond();
 
 	if (rank == 0)
 	{
-		data = (double*)malloc(size * sizeof(double));
-		comm = (int*)malloc(size * sizeof(int));
-		for (uint i = 0; i < size; i++) {
+		data = (double *)malloc(size * sizeof(double));
+		comm = (int *)malloc(size * sizeof(int));
+		for (uint i = 0; i < size; i++)
+		{
 			comm[i] = first;
 			data[i] = second;
 		}
@@ -50,11 +51,12 @@ void send(Message &msg, int rank, int size)
 		{
 			print("Sended commands");
 			for (uint i = 0; i < size; i++)
+			{
 				printf("comm:%d data:%.16lf \n", comm[i], data[i]);
-			print("\n");
+			}
 		}
 	}
-	
+
 	MPI_Scatter(comm, 1, MPI_INT, &first, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI_Scatter(data, 1, MPI_DOUBLE, &second, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
@@ -69,12 +71,12 @@ void send(Message &msg, int rank, int size)
 
 void get(Message &msg, int rank, int size)
 {
-	int* comm = nullptr;
+	int *comm = nullptr;
 	double *data = nullptr;
-	int first = msg.getFirst(); 
+	int first = msg.getFirst();
 	double second = msg.getSecond();
-    
-	if (DEBUG) 
+
+	if (DEBUG)
 	{
 		printf("Sended >> comm:%d data:%.16lf by %d\n", first, second, rank);
 	}
@@ -82,8 +84,8 @@ void get(Message &msg, int rank, int size)
 	if (rank == 0)
 	{
 		msg.setData(
-			comm = (int*)malloc(size * sizeof(int)), 
-			data = (double*)malloc(size * sizeof(double)));
+			comm = (int *)malloc(size * sizeof(int)),
+			data = (double *)malloc(size * sizeof(double)));
 	}
 	MPI_Gather(&first, 1, MPI_INT, comm, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI_Gather(&second, 1, MPI_DOUBLE, data, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
