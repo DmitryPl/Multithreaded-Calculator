@@ -47,17 +47,28 @@ void Calculator::Dialog()
 			flag = false;
 			break;
 		}
-		else if (str == "DEBUG:change")
+		else if (str == "DSYS:change")
 		{
-			DEBUG = !DEBUG;
+			changeDebugSys();
 		}
 		else if (str == "SUM:change")
 		{
 			SUM = !SUM;
+			printf("SUM:%s\n", SUM == true ? "true" : "false");
 		}
 		else if (str == "DFACT:change")
 		{
 			DEBUG_FACT = !DEBUG_FACT;
+			printf("DEBUG FACT:%s\n", DEBUG_FACT == true ? "true" : "false");
+		}
+		else if (str == "DSUM:change")
+		{
+			changeDebugSum();
+		}
+		else if (str == "DALL:change")
+		{
+			changeDebugSum();
+			changeDebugSys();
 		}
 		else
 		{
@@ -279,7 +290,6 @@ double Calculator::GetI()
 		val = GetFunc(2);
 		if (val < 0)
 		{
-
 			return log(val);
 		}
 		else
@@ -371,7 +381,7 @@ void Calculator::init()
 		int cell = level / (world_size);
 		start = world_rank * cell;
 		end = (world_rank == world_size - 1) ? (level) : ((world_rank + 1) * cell - 1);
-		if (DEBUG)
+		if (DEBUG_SYS)
 		{
 			printf("Cell >> start:%d end:%d to %d\n", start, end, world_rank);
 		}
@@ -419,14 +429,17 @@ void Calculator::wait()
 			level = msg.getSecond();
 			init();
 			break;
+		case CHANGE_DEBUG_SUM:
+			changeDebugSum();
+			break;
+		case CHANGE_DEBUG_SYS:
+			changeDebugSys();
+			break;
 		case SIN:
 			sinus(msg.getSecond());
 			break;
 		case COS:
 			cosinus(msg.getSecond());
-			break;
-		case LN:
-			logariphm(msg.getSecond());
 			break;
 		default:
 			flag = false;
@@ -445,7 +458,7 @@ double Calculator::sinus(double x)
 	double sum = 0;
 	for (int i = start; i <= end; i++)
 	{
-		if (SUM)
+		if (DEBUG_SUM)
 		{
 			printf("components: %lf %lf %ld for %d   ",
 				   pow(-1, i),
@@ -453,7 +466,7 @@ double Calculator::sinus(double x)
 				   factorials[2 * i + 1], i);
 		}
 		sum += pow(-1, i) * pow(x, 2 * i + 1) / factorials[2 * i];
-		if (SUM)
+		if (DEBUG_SUM)
 		{
 			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
 		}
@@ -480,7 +493,7 @@ double Calculator::cosinus(double x)
 	double sum = 0;
 	for (int i = start; i <= end; i++)
 	{
-		if (SUM)
+		if (DEBUG_SUM)
 		{
 			printf("components: %lf %lf %ld for %d   ",
 				   pow(-1, i),
@@ -488,7 +501,7 @@ double Calculator::cosinus(double x)
 				   factorials[2 * i], i);
 		}
 		sum += pow(-1, i) * pow(x, 2 * i) / factorials[2 * i];
-		if (SUM)
+		if (DEBUG_SUM)
 		{
 			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);
 		}
@@ -503,19 +516,6 @@ double Calculator::cosinus(double x)
 	{
 		return 0.0;
 	}
-}
-
-double Calculator::logariphm(double x)
-{
-	if (world_rank == 0)
-	{
-		Message msg(LN, x);
-		send(msg, world_rank, world_size);
-	}
-	else
-	{
-	}
-	return NAN;
 }
 
 long Calculator::getFactorial(long n)
@@ -589,4 +589,26 @@ inline void Calculator::check()
 inline double Calculator::getTime(double start)
 {
 	return MPI_Wtime() - start;
+}
+
+inline void Calculator::changeDebugSys()
+{
+	DEBUG_SYS = !DEBUG_SYS;
+	printf("DEBUG SYS:%s\n", DEBUG_SYS == true ? "true" : "false");
+	if (world_rank == 0)
+	{
+		Message msg(CHANGE_DEBUG_SYS, CHANGE_DEBUG_SYS);
+		send(msg, world_rank, world_size);
+	}
+}
+
+inline void Calculator::changeDebugSum()
+{
+	DEBUG_SUM = !DEBUG_SUM;
+	printf("DEBUG SUM:%s\n", DEBUG_SUM == true ? "true" : "false");
+	if (world_rank == 0)
+	{
+		Message msg(CHANGE_DEBUG_SUM, CHANGE_DEBUG_SUM);
+		send(msg, world_rank, world_size);
+	}
 }

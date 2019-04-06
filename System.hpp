@@ -16,13 +16,20 @@ const static double PI = 3.1415926535897932385;
 const static double E = 2.7182818284590452354;
 
 bool SUM = true;
-bool DEBUG = true;
+bool DEBUG_SUM = true;
+bool DEBUG_SYS = true;
 bool DEBUG_FACT = false;
 
 enum Commands
 {
-	ERROR = -1, HALT, INIT,
-	SIN = 11, COS, LN
+	ERROR = -1,
+	HALT,
+	INIT,
+	CHANGE_DEBUG_SUM,
+	CHANGE_DEBUG_SYS,
+	SIN = 11,
+	COS,
+	LN
 };
 
 class SystemException : public exception
@@ -51,7 +58,7 @@ class Message
   private:
 	int first;
 	double second;
-	int* comm;
+	int *comm;
 	double *data;
 
   public:
@@ -61,10 +68,16 @@ class Message
 	double getSecond() const { return second; }
 	int getComm(uint i) const { return comm[i]; }
 	double getData(uint i) const { return data[i]; }
-	void setData(int* _comm, double* _data) { data = _data; comm = _comm; }
-	double returnSum(uint size) {
+	void setData(int *_comm, double *_data)
+	{
+		data = _data;
+		comm = _comm;
+	}
+	double returnSum(uint size)
+	{
 		double sum = 0;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++)
+		{
 			sum += data[i];
 		}
 		return sum;

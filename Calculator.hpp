@@ -30,7 +30,6 @@ using std::string;
 class Calculator
 {
 private:
-  uint place;
   uint level;
   ulong *factorials;
 
@@ -39,16 +38,11 @@ private:
   uint start;
   uint end;
 
+  uint place;
   string str;
   double answer;
 
-  double getTime(double start);
-  void Dialog();
-  bool parse();
-  void skip();
-  void update();
-  void check();
-
+  //functions of LL-parser
   double GetN();
   double GetT();
   double GetE();
@@ -57,19 +51,32 @@ private:
   double GetI();
   double GetFunc(uint i);
 
+  //calculation factorial
   long getFactorial(long n);
   void factorial(int n);
   void printFact();
 
+  //sys fun
   void master();
+  void slave();
   void halt();
   void init();
   void wait();
+  void Dialog();
+  void skip();
+  void update();
+  void check();
+  bool parse();
+  double getTime(double start);
+  void changeDebugSum();
+  void changeDebugSys();
+  
+  //sum func
   double sinus(double x);
   double cosinus(double x);
-  double logariphm(double x);
-  double exponenta(double x);
-  void slave();
+  //double logariphm(double x);
+  //double exponenta(double x);
+
   Calculator() {}
 
 public:

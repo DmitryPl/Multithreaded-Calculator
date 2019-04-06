@@ -33,7 +33,7 @@ int main()
     }
     catch (...)
     {
-        print("Error - default\n");
+        print("Error - default");
     }
     return 0;
 }

@@ -47,7 +47,7 @@ void send(Message &msg, int rank, int size)
 			data[i] = second;
 		}
 
-		if (DEBUG)
+		if (DEBUG_SYS)
 		{
 			print("Sended commands");
 			for (uint i = 0; i < size; i++)
@@ -76,7 +76,7 @@ void get(Message &msg, int rank, int size)
 	int first = msg.getFirst();
 	double second = msg.getSecond();
 
-	if (DEBUG)
+	if (DEBUG_SYS)
 	{
 		printf("Sended >> comm:%d data:%.16lf by %d\n", first, second, rank);
 	}
