@@ -31,11 +31,6 @@ void Calculator::master()
 
 void Calculator::Dialog()
 {
-	if (world_rank != 0)
-	{
-		throw SystemException(__LINE__, __func__, "Error - wrong thread");
-	}
-
 	bool flag = true;
 	while (flag)
 	{
@@ -48,28 +43,21 @@ void Calculator::Dialog()
 			flag = false;
 			break;
 		}
-		else if (str == "DSYS:change")
+		else if (str.substr(0, 4) == "DSYS")
 		{
 			changeDebugSys();
 		}
-		else if (str == "SUM:change")
+		else if (str == "SUM" || str == "LIB")
 		{
-			SUM = !SUM;
-			printf("SUM:%s\n", SUM == true ? "true" : "false");
+			changeSum();
 		}
-		else if (str == "DFACT:change")
-		{
-			DEBUG_FACT = !DEBUG_FACT;
-			printf("DEBUG FACT:%s\n", DEBUG_FACT == true ? "true" : "false");
-		}
-		else if (str == "DSUM:change")
+		else if (str.substr(0, 4) == "DSUM")
 		{
 			changeDebugSum();
 		}
-		else if (str == "DALL:change")
+		else if (str.substr(0, 4) == "DALL")
 		{
-			changeDebugSum();
-			changeDebugSys();
+			changeDebugAll();
 		}
 		else
 		{
@@ -462,10 +450,10 @@ void Calculator::wait()
 			init();
 			break;
 		case CHANGE_DEBUG_SUM:
-			changeDebugSum();
+			changeDebugSlave(msg.getSecond(), DEBUG_SUM);
 			break;
 		case CHANGE_DEBUG_SYS:
-			changeDebugSys();
+			changeDebugSlave(msg.getSecond(), DEBUG_SUM);
 			break;
 		case SIN:
 			sinus(msg.getSecond());
@@ -595,7 +583,9 @@ void Calculator::printFact()
 		printf("\n");
 	}
 	else
+	{
 		print("nullptr - factorials");
+	}
 }
 
 inline void Calculator::skip()
@@ -616,7 +606,8 @@ inline void Calculator::update()
 inline void Calculator::check()
 {
 	printf("Entered string:\n%s\n", str.c_str());
-	for (int i = 0; i < place; i++) {
+	for (int i = 0; i < place; i++)
+	{
 		printf(" ");
 	}
 	print("^");
@@ -628,24 +619,85 @@ inline double Calculator::getTime(double start)
 	return MPI_Wtime() - start;
 }
 
-inline void Calculator::changeDebugSys()
+void Calculator::changeDebugSys()
 {
-	DEBUG_SYS = !DEBUG_SYS;
-	printf("DEBUG SYS:%s\n", DEBUG_SYS == true ? "true" : "false");
-	if (world_rank == 0)
+	changeDebugFlag(DEBUG_SYS);
+
+	Message msg(CHANGE_DEBUG_SYS, DEBUG_SYS);
+	send(msg, world_rank, world_size);
+	if (DEBUG_SYS)
 	{
-		Message msg(CHANGE_DEBUG_SYS, CHANGE_DEBUG_SYS);
-		send(msg, world_rank, world_size);
+		printf("Debug flag changed to:true\n");
 	}
 }
 
-inline void Calculator::changeDebugSum()
+void Calculator::changeDebugSlave(int state, bool &flag)
 {
-	DEBUG_SUM = !DEBUG_SUM;
-	printf("DEBUG SUM:%s\n", DEBUG_SUM == true ? "true" : "false");
-	if (world_rank == 0)
+	if (state == true)
 	{
-		Message msg(CHANGE_DEBUG_SUM, CHANGE_DEBUG_SUM);
-		send(msg, world_rank, world_size);
+		flag = true;
 	}
+	else if (state == false)
+	{
+		flag = false;
+	}
+	else
+	{
+		throw SystemException("Error - bad state - stop programm");
+	}
+}
+
+void Calculator::changeDebugSum()
+{
+	changeDebugFlag(DEBUG_SUM);
+
+	Message msg(CHANGE_DEBUG_SUM, DEBUG_SUM);
+	send(msg, world_rank, world_size);
+	if (DEBUG_SYS)
+	{
+		printf("DEBUG SUM:%s\n", DEBUG_SUM == true ? "true" : "false");
+	}
+}
+
+void Calculator::changeDebugFlag(bool &flag)
+{
+	if (world_rank != 0)
+	{
+		throw SystemException(__LINE__, __func__, "Error - Wrong thread");
+	}
+
+	if (str.substr(4, 3) == ":on")
+	{
+		flag = true;
+	}
+	else if (str.substr(4, 4) == ":off")
+	{
+		flag = false;
+	}
+	else
+	{
+		throw SystemException(__LINE__, __func__, "Error - wrong command");
+	}
+}
+
+void Calculator::changeSum()
+{
+	if (str == "SUM")
+	{
+		SUM = true;
+	}
+	else
+	{
+		SUM = false;
+	}
+	if (DEBUG_SYS)
+	{
+		printf("SUM:%s\n", SUM == true ? "true" : "false");
+	}
+}
+
+void Calculator::changeDebugAll()
+{
+	changeDebugSum();
+	changeDebugSys();
 }

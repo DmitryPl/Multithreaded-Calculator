@@ -46,20 +46,27 @@ private:
   void factorial(int n);
   void printFact();
 
-  //sys fun
+  ////sys fun
+  //master fun
   void master();
-  void slave();
   void halt();
-  void init();
-  void wait();
   void Dialog();
   void skip();
   void update();
   void check();
   bool parse();
-  double getTime(double start);
+  void changeDebugAll();
+  void changeSum();
   void changeDebugSum();
   void changeDebugSys();
+  void changeDebugFlag(bool& flag);
+  //slave fun
+  void slave();
+  void wait();
+  void changeDebugSlave(int state, bool& flag);
+  //both
+  void init();
+  double getTime(double start);
   
   //sum func
   double sinus(double x);
