@@ -11,6 +11,9 @@
 using std::exception;
 using std::string;
 
+typedef unsigned int uint;
+typedef unsigned long ulong;
+
 const static int success = 42;
 const static double PI = 3.1415926535897932385;
 const static double E = 2.7182818284590452354;

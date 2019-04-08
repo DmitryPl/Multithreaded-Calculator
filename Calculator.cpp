@@ -279,13 +279,13 @@ double Calculator::GetI()
 		skip();
 		return E;
 	}
-	if (str[place] == 'p' && str[place + 1] == 'i')
+	else if (str.substr(0, 3) == "pi")
 	{
 		place += 2;
 		skip();
 		return PI;
 	}
-	if (str[place] == 'l' && str[place + 1] == 'n')
+	else if (str.substr(0, 3) == "ln")
 	{
 		val = GetFunc(2);
 		if (val < 0)
@@ -293,9 +293,11 @@ double Calculator::GetI()
 			return log(val);
 		}
 		else
+		{
 			throw SystemException("Error - GetI - < 0 - log");
+		}
 	}
-	else if (str[place] == 's' && str[place + 1] == 'i' && str[place + 2] == 'n')
+	else if (str.substr(0, 3) == "sin")
 	{
 		val = GetFunc(3);
 		if (SUM)
@@ -307,7 +309,7 @@ double Calculator::GetI()
 			return sin(val);
 		}
 	}
-	else if (str[place] == 'c' && str[place + 1] == 'o' && str[place + 2] == 's')
+	else if (str.substr(0, 3) == "cos")
 	{
 		val = GetFunc(3);
 		if (SUM)
@@ -319,7 +321,7 @@ double Calculator::GetI()
 			return cos(val);
 		}
 	}
-	else if (str[place] == 's' && str[place + 1] == 'q' && str[place + 2] == 'r' && str[place + 3] == 't')
+	else if (str.substr(0, 4) == "sqrt")
 	{
 		val = GetFunc(4);
 		if (val >= 0)
@@ -327,7 +329,13 @@ double Calculator::GetI()
 			return sqrt(val);
 		}
 		else
+		{
 			throw SystemException("Error - GetI - < 0 - sqrt");
+		}
+	}
+	else
+	{
+		throw SystemException("Error - GetI - wrong func");
 	}
 }
 
