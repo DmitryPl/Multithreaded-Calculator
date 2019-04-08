@@ -1,0 +1,7 @@
+{
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "files.associations": {
+        "cstdio": "cpp",
+        "exception": "cpp"
+    }
+}

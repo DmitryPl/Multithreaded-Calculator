@@ -4,8 +4,7 @@ Concurrency Lessons 2019
 ## Example
 cos(0.15/e)*sin(0.17)*8
 
-## Compile && Run
-mpic++ -g -o test.o main.cpp (in VS)  
+## Run  
 mpirun -np N test.o (N - num of threads)  
 
 ## System commands

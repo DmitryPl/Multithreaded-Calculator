@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "command": "mpic++",
+    "args": [
+        "-g",
+        "-o",
+        "test.o",
+        "main.cpp"
+    ],
+    "problemMatchers": [],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    }
+}

@@ -10,7 +10,6 @@
 # Precompiled Headers
 *.gch
 *.pch
-*.ipch
 
 # Compiled Dynamic libraries
 *.so
@@ -28,5 +27,4 @@
 *.out
 *.app
 
-*.json
-*.vscode
+ipch
