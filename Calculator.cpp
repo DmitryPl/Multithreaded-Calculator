@@ -33,7 +33,7 @@ void Calculator::Dialog()
 {
 	if (world_rank != 0)
 	{
-		throw SystemException("Error - wrong thread");
+		throw SystemException(__LINE__, __func__, "Error - wrong thread");
 	}
 
 	bool flag = true;
@@ -42,6 +42,7 @@ void Calculator::Dialog()
 		update();
 		print("Enter function");
 		getline(cin, str);
+
 		if (str == "exit")
 		{
 			flag = false;
@@ -93,9 +94,14 @@ bool Calculator::parse()
 		answer = GetP();
 		return true;
 	}
-	catch (const SystemException &exc)
+	catch (const ParseException &exc)
 	{
 		check();
+		print(exc.what());
+		return false;
+	}
+	catch (const SystemException &exc)
+	{
 		print(exc.what());
 		return false;
 	}
@@ -114,10 +120,14 @@ double Calculator::GetP()
 			return val;
 		}
 		else
-			throw SystemException("Error - GetP - ()");
+		{
+			throw ParseException("Error - GetP - ()");
+		}
 	}
 	else
+	{
 		return GetE();
+	}
 }
 
 double Calculator::GetE()
@@ -155,7 +165,9 @@ double Calculator::GetT()
 				val /= val2;
 			}
 			else
-				throw SystemException("Error - div 0");
+			{
+				throw ParseException("Error - div 0");
+			}
 		}
 	}
 	return val;
@@ -179,7 +191,9 @@ double Calculator::GetD()
 				return pow(val, val2);
 			}
 			else
-				throw SystemException("Error - GetD - ()");
+			{
+				throw ParseException("Error - GetD - ()");
+			}
 		}
 		else
 		{
@@ -188,7 +202,9 @@ double Calculator::GetD()
 		}
 	}
 	else
+	{
 		return val;
+	}
 }
 
 double Calculator::GetN()
@@ -263,10 +279,14 @@ double Calculator::GetN()
 				return -1 * val;
 			}
 			else
+			{
 				return val;
+			}
 		}
 		else
-			throw SystemException("Error - GetN - wrong num");
+		{
+			throw ParseException("Error - GetN - wrong num");
+		}
 	}
 }
 
@@ -294,7 +314,7 @@ double Calculator::GetI()
 		}
 		else
 		{
-			throw SystemException("Error - GetI - < 0 - log");
+			throw ParseException("Error - GetI - < 0 - log");
 		}
 	}
 	else if (str.substr(0, 3) == "sin")
@@ -330,12 +350,12 @@ double Calculator::GetI()
 		}
 		else
 		{
-			throw SystemException("Error - GetI - < 0 - sqrt");
+			throw ParseException("Error - GetI - < 0 - sqrt");
 		}
 	}
 	else
 	{
-		throw SystemException("Error - GetI - wrong func");
+		throw ParseException("Error - GetI - wrong func");
 	}
 }
 
@@ -354,17 +374,21 @@ double Calculator::GetFunc(uint n)
 			return val;
 		}
 		else
-			throw SystemException("Error - GetFunc - )");
+		{
+			throw ParseException("Error - GetFunc - )");
+		}
 	}
 	else
-		throw SystemException("Error - GetFunc - (");
+	{
+		throw ParseException("Error - GetFunc - (");
+	}
 }
 
 void Calculator::halt()
 {
 	if (world_rank != 0)
 	{
-		throw SystemException("Error - wrong thread");
+		throw SystemException(__LINE__, __func__, "Error - wrong thread");
 	}
 
 	Message msg(HALT, HALT);
@@ -396,7 +420,7 @@ void Calculator::init()
 	}
 	else
 	{
-		throw SystemException("Error - level < world_size");
+		throw SystemException(__LINE__, __func__, "Error - level < world_size");
 	}
 }
 
@@ -591,7 +615,12 @@ inline void Calculator::update()
 
 inline void Calculator::check()
 {
-	printf("string:%s\nchar:%c\nplace:%d\n", str.c_str(), str[place], place);
+	printf("Entered string:\n%s\n", str.c_str());
+	for (int i = 0; i < place; i++) {
+		printf(" ");
+	}
+	print("^");
+	printf("Error on char:'%c'\n", str[place]);
 }
 
 inline double Calculator::getTime(double start)

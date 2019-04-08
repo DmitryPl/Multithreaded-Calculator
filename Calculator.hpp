@@ -1,17 +1,7 @@
 #ifndef CALC_H
 #define CALC_H
 
-// Rules
-// G ::= P \0
-// N ::= P | I | [ + - ] [ 0 - 9 ] +
-// E ::= T { [ + - ] E } *
-// T ::= D { [ * / ] T } *
-// P ::= [ ( E ) | E ] *
-// I ::= [ sin ( | cos ( | ln(  | sqrt( | e |  pi ] E )
-// D ::= N ^ { ( E ) | N }
-
 #include "System.hpp"
-#include "openmpi/mpi.h"
 
 #include <unistd.h>
 #include <cstdio>
