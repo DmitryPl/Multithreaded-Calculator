@@ -4,7 +4,7 @@
     "args": [
         "-g",
         "-o",
-        "test.o",
+        "calc",
         "main.cpp"
     ],
     "problemMatchers": [],
