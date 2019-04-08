@@ -1,11 +1,15 @@
 # Multithreaded Calculator
 Concurrency Lessons 2019
 
-## Example
-cos(0.15/e)*sin(0.17)*8
+## Compile
+To compile, use `make` command
 
 ## Run  
-mpirun -np N test.o (N - num of threads)  
+To run the app, use `make run n=X` command, where `X` is number of threads.
+
+## Example
+When running the app, enter the function to compute, like:
+`cos(0.15/e)*sin(0.17)*8`
 
 ## System commands
 exit -> halt all threads and exit  
