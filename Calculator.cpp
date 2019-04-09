@@ -287,13 +287,13 @@ double Calculator::GetI()
 		skip();
 		return E;
 	}
-	else if (str.substr(0, 3) == "pi")
+	else if (str.substr(place, 2) == "pi")
 	{
 		place += 2;
 		skip();
 		return PI;
 	}
-	else if (str.substr(0, 3) == "ln")
+	else if (str.substr(place, 2) == "ln")
 	{
 		val = GetFunc(2);
 		if (val < 0)
@@ -305,7 +305,7 @@ double Calculator::GetI()
 			throw ParseException("Error - GetI - < 0 - log");
 		}
 	}
-	else if (str.substr(0, 3) == "sin")
+	else if (str.substr(place, 3) == "sin")
 	{
 		val = GetFunc(3);
 		if (SUM)
@@ -317,7 +317,7 @@ double Calculator::GetI()
 			return sin(val);
 		}
 	}
-	else if (str.substr(0, 3) == "cos")
+	else if (str.substr(place, 3) == "cos")
 	{
 		val = GetFunc(3);
 		if (SUM)
@@ -329,7 +329,7 @@ double Calculator::GetI()
 			return cos(val);
 		}
 	}
-	else if (str.substr(0, 4) == "sqrt")
+	else if (str.substr(place, 4) == "sqrt")
 	{
 		val = GetFunc(4);
 		if (val >= 0)
@@ -520,7 +520,7 @@ double Calculator::cosinus(double x)
 				   pow(x, 2 * i),
 				   factorials[2 * i], i);
 		}
-		sum += pow(-1, i) * pow(x, 2 * i) / factorials[2 * i];
+		sum += pow(-1, i) * pow(x, 2 * i) / (i == 0 ? 1 :factorials[2 * i - 1]);
 		if (DEBUG_SUM)
 		{
 			printf("n=%d sum=%.16lf rank=%d\n", i, sum, world_rank);

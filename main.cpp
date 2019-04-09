@@ -19,7 +19,7 @@ int main()
 
         if (world_size < 1)
         {
-            throw SystemException(__LINE__, __func__, "Error - world size < 3");
+            throw SystemException(__LINE__, __func__, "Error - world size < 1");
         }
 
         Calculator calc(world_rank, world_size);
